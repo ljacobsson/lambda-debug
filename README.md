@@ -46,11 +46,7 @@ Add the following configuration to your `.vscode/launch.json` file:
       "program": "${workspaceFolder}/node_modules/lambda-debugr/connect.js",
       "restart": true,
       "env": {
-        "outDir": "dist",
-        "configEnv": "default",
-        "includeFunctions": "HelloWorldFunction",
-        "excludeFunctions": "GoodbyeWorldFunction",
-        "timeout": "120",
+        "outDir": "dist"
       },
       "postDebugTask": "lambda-debug-cleanup",
       "console": "integratedTerminal",
