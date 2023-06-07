@@ -2,7 +2,7 @@
 
 Lambda-Debug is a tool that enables you to invoke AWS Lambda functions in the cloud from any event source and intercept the requests with breakpoints locally. It is currently designed to work with AWS SAM and CloudFormation.
 
-![Demo](images/demo.gif)
+![Demo](https://raw.githubusercontent.com/ljacobsson/lambda-debug/main/images/demo.gif)
 
 ## Setup
 
