@@ -1,0 +1,4 @@
+*.zip
+relay/cert.pem
+relay/key.pem
+relay/config.json

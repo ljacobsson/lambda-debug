@@ -1,0 +1,23 @@
+{
+  "name": "lambda-debug",
+  "version": "1.0.0",
+  "description": "Library to help debug JS/TS AWS Lambda functions locally",
+  "main": "index.js",
+  "type": "module",
+  "author": "ljacobsson",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.345.0",
+    "@aws-sdk/client-iot": "^3.345.0",
+    "@aws-sdk/client-lambda": "^3.345.0",
+    "@aws-sdk/client-sts": "^3.347.1",
+    "@aws-sdk/credential-provider-sso": "^3.345.0",
+    "archiver": "^5.3.1",
+    "getmac": "^5.20.0",
+    "ini": "^4.1.1",
+    "mqtt": "^4.3.7",
+    "nodemon": "^2.0.22",
+    "tsc-watch": "^6.0.4",
+    "yaml-cfn": "^0.3.2"
+  }
+}
