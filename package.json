@@ -6,6 +6,9 @@
   "type": "module",
   "author": "ljacobsson",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@aws-sdk/client-cloudformation": "^3.345.0",
     "@aws-sdk/client-iot": "^3.345.0",
