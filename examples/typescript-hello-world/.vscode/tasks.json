@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "lambda-debug-cleanup",
+      "type": "shell",      
+      "command": "node ${workspaceFolder}/node_modules/lambda-debug/cleanup.js"
+    }
+  ]
+}

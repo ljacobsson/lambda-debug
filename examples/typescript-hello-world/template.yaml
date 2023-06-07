@@ -1,0 +1,42 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+  - AWS::Serverless-2016-10-31
+Description: test-debug
+Parameters: {}
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/HelloWorldFunction.handler
+      CodeUri: .
+      Runtime: nodejs18.x
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        GetItem:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /hello
+    Metadata:
+      BuildMethod: esbuild
+  GoodbyeWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/GoodbyeWorldFunction.handler
+      CodeUri: .
+      Runtime: nodejs18.x
+      MemorySize: 128
+      Timeout: 3
+      Events:
+        GetItem:
+          Type: Api
+          Properties:
+            Method: get
+            Path: /bye
+    Metadata:
+      BuildMethod: esbuild
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

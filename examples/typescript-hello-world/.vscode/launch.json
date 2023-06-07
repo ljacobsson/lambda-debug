@@ -1,0 +1,25 @@
+{
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Lambda functions",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/lambda-debug/node_modules/.bin/nodemon",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/node_modules/lambda-debug/connect.js",
+      "restart": true,
+      "env": {
+        "outDir": "dist",
+        "configEnv": "default",
+        "includeFunctions": "HelloWorldFunction",
+        "excludeFunctions": "GoodbyeWorldFunction",
+        "timeout": "120",
+      },
+      "postDebugTask": "lambda-debug-cleanup",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"      
+    },
+  ]
+}

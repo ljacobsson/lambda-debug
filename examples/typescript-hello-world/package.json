@@ -1,0 +1,37 @@
+{
+  "name": "test-debug",
+  "description": "test-debug",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^1.2.1",
+    "@aws-lambda-powertools/metrics": "^1.2.1",
+    "@aws-lambda-powertools/tracer": "^1.2.1",
+    "@mhlabs/dynamodb-client": "^3.0.6",
+    "@middy/core": "^4.0.9",
+    "@middy/http-cors": "^4.0.9",
+    "aws4-axios": "^2.4.9",
+    "axios": "^0.27.2",
+    "esbuild": "^0.14.14"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "latest",
+    "@types/aws-lambda": "^8.10.101",
+    "@typescript-eslint/eslint-plugin": "^5.10.2",
+    "@typescript-eslint/parser": "^5.10.2",
+    "@vitest/coverage-c8": "^0.29.3",
+    "eslint": "^7.30.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "lambda-debug": "^1.0.1",
+    "typescript": "^5.0.4",
+    "vitest": "^0.29.3"
+  },
+  "scripts": {
+    "lint": "eslint '*.ts' --quiet --fix",
+    "compile": "tsc",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ci": "npm run compile && vitest run --coverage --reporter=json --outputFile.json=./coverage/report.json"
+  }
+}

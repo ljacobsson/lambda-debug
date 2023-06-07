@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "test-debug"
+resolve_s3 = true
+s3_prefix = "test-debug"
+region = "eu-west-1"
+capabilities = "CAPABILITY_IAM"
+
+[default.build.parameters]
+beta_features = true
