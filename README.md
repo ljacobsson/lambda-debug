@@ -49,7 +49,7 @@ Add the following configuration to your `.vscode/launch.json` file:
       "type": "node",
       "request": "launch",
       "name": "Debug Lambda functions",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/lambda-debug/node_modules/.bin/nodemon",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/node_modules/lambda-debugr/connect.js",
       "restart": true,
