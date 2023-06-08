@@ -2,6 +2,14 @@
 
 Lambda-Debug is a tool that enables you to invoke AWS Lambda functions in the cloud from any event source and intercept the requests with breakpoints locally. There's currently similar functionality in [SST](https://sst.dev/) which this is inspired by, but is designed to work with AWS SAM and CloudFormation.
 
+<blink>*** NOTE: This is intended to be used to debug functions in a development environment. DO NOT use in production. ***</blink>
+
+## Features
+* **Local debugging**: Set breakpoints in your code and step through your functions invocations locally on native events triggered in the cloud.
+* **No code changes**: No need to modify your code to enable debugging. Just add some dev dependencies and some configuration.
+* **Same IAM permissions**: Your functions will run with the same IAM permissions as they do in the cloud.
+* **Fast iterations**: No need to deploy your code to the cloud to test changes. Just save your code and invoke your functions in the cloud.
+
 ![Demo](https://raw.githubusercontent.com/ljacobsson/lambda-debug/main/images/demo.gif)
 
 ## Setup
