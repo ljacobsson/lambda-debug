@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "author": "ljacobsson",
-  "license": "ISC",
+  "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
