@@ -189,8 +189,8 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
     }
   });
   obj.handler = handlerFolders.join('/');
-  const handler = obj.handler + '/' + functionHandler.split('.')[0];
-  map[obj.name] = import(`${process.cwd()}/${baseDir}${handler}.js`);
+  const handler = (obj.handler + '/' + functionHandler.split('.')[0]).replace('//', '/');
+  map[obj.name] = import(`file://${process.cwd()}/${baseDir}${handler}.js`);
 
   return map;
 }, {});

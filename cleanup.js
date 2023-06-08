@@ -5,10 +5,15 @@ import ini from 'ini';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 console.log("Cleaning up....");
 let configEnv = 'default';
+let functions = undefined;
 const cachePath = process.cwd() + "/.lambda-debug";
 
 if (fs.existsSync(cachePath)) {
-  configEnv = JSON.parse(fs.readFileSync(cachePath, 'utf-8')).configEnv || 'default';
+  const conf = JSON.parse(fs.readFileSync(cachePath, 'utf-8'));
+  configEnv = conf.configEnv || 'default';
+  if (conf.functions) {
+    functions = conf.functions;
+  }
   fs.unlinkSync(process.cwd() + "/.lambda-debug");
 }
 
@@ -24,7 +29,7 @@ const stack = await cfnClient.send(new ListStackResourcesCommand({ StackName: st
 
 const template = JSON.parse(templateResponse.TemplateBody);
 
-const functions = Object.keys(template.Resources).filter(key => template.Resources[key].Type === "AWS::Lambda::Function");;
+functions = functions || Object.keys(template.Resources).filter(key => template.Resources[key].Type === "AWS::Lambda::Function");;
 
 const updatePromises = functions.map(async functionName => {
   let updated = false;
