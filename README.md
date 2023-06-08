@@ -129,3 +129,10 @@ Though AWS IoT usage in this scenario doesn't carry additional costs, be aware t
 ## Restoration Post-Debugging
 
 Once your debugging session is concluded, Lambda-Debug restores your function back to its original state. This includes resetting the function code as well as the function configuration to their original values, ensuring your live environment is left untouched and as intended.
+
+## Troubleshooting
+#### >>> I log in to AWS SSO, but still get access denied exception
+This is due to [a bug](https://github.com/aws/aws-sdk/issues/531) in the aws-sdk-v3 and is unrelated to this project. It happens sometimes when the SSO session expires. To get around this, go to your sso start url, clear cookies and log in again
+
+#### >>> I make a code change and my function invocation doesn't reach my code
+When the code is changed, the debugger will reload. This results in a sub-second (depending on your internet connection) disconnection from the MQTT topic. If your function invocation happens during this time, it will not reach your code. To avoid this, wait a few seconds after making a code change before invoking your function.
