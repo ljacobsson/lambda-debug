@@ -5,10 +5,10 @@ Lambda-Debug is a tool that enables you to invoke AWS Lambda functions in the cl
 <blink>*** NOTE: This is intended to be used to debug functions in a development environment. DO NOT use in production. ***</blink>
 
 ## Features
-* **Local debugging**: Set breakpoints in your code and step through your functions invocations locally on native events triggered in the cloud.
-* **No code changes**: No need to modify your code to enable debugging. Just add some dev dependencies and some configuration.
-* **Same IAM permissions**: Your functions will run with the same IAM permissions as they do in the cloud.
-* **Fast iterations**: No need to deploy your code to the cloud to test changes. Just save your code and invoke your functions in the cloud.
+* :house: **Local debugging**: Set breakpoints in your code and step through your functions invocations locally on native events triggered in the cloud.
+* :+1: **No code changes**: No need to modify your code to enable debugging. Just add some dev dependencies and some configuration.
+* :closed_lock_with_key: **Same IAM permissions**: Your functions will run with the same IAM permissions as they do in the cloud.
+* :zap: **Fast iterations**: No need to deploy your code to the cloud to test changes. Just save your code and invoke your functions in the cloud.
 
 ![Demo](https://raw.githubusercontent.com/ljacobsson/lambda-debug/main/images/demo.gif)
 
