@@ -1,6 +1,6 @@
 {
   "name": "lambda-debug",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Library to help debug JS/TS AWS Lambda functions locally",
   "main": "index.js",
   "type": "module",
@@ -13,7 +13,7 @@
     "@aws-sdk/client-cloudformation": "^3.345.0",
     "@aws-sdk/client-iot": "^3.345.0",
     "@aws-sdk/client-lambda": "^3.345.0",
-    "@aws-sdk/client-sts": "^3.347.1",
+    "@aws-sdk/client-sts": "^3.348.0",
     "@aws-sdk/credential-provider-sso": "^3.345.0",
     "archiver": "^5.3.1",
     "getmac": "^5.20.0",
