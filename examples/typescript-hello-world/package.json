@@ -23,7 +23,9 @@
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "lambda-debug": "^1.0.1",
+    "lambda-debug": "^1.0.5",
+    "nodemon": "^2.0.22",
+    "tsc-watch": "^6.0.4",
     "typescript": "^5.0.4",
     "vitest": "^0.29.3"
   },
