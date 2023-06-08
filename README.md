@@ -12,7 +12,7 @@ Follow these steps to configure lambda-debug:
 You need to install the `lambda-debug` and `tsc-watch` dependencies. 
 
 ```
-npm install --save lambda-debug tsc-watch
+npm install --save-dev lambda-debug tsc-watch nodemon
 ```
 
 ### Step 2: Update tsconfig.json
