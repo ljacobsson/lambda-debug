@@ -23,7 +23,20 @@ You need to install the `lambda-debug` and `tsc-watch` dependencies.
 npm install --save-dev lambda-debug tsc-watch nodemon
 ```
 
-### Step 2: Update tsconfig.json
+### Step 2: Configure development environment.
+Currently there's only config support for vscode, but nothing suggests this can't be used with other code editors.
+
+```
+npx lambda-debug-setup
+```
+
+This will update `tsconfig.json`, `.vscode/launch-config` and `.vscode/tasks.json`. Make sure to review the diff to understand the changes.
+
+<details>
+  <summary>Summary of changes</summary>
+  <p>
+    
+### 1: Update tsconfig.json
 Add the following to your `tsconfig.json` file along with the rest of your config:
 
 ```json
@@ -38,7 +51,7 @@ Add the following to your `tsconfig.json` file along with the rest of your confi
 }
 ```
 
-### Step 3: Update .vscode/launch.json
+### 2: Update .vscode/launch.json
 Add the following configuration to your `.vscode/launch.json` file:
 
 ```json
@@ -64,7 +77,7 @@ Add the following configuration to your `.vscode/launch.json` file:
 }
 ```
 
-### Step 4: Update .vscode/tasks.json
+### 3: Update .vscode/tasks.json
 Add the following task to your `.vscode/tasks.json` file:
 
 ```json
@@ -79,6 +92,8 @@ Add the following task to your `.vscode/tasks.json` file:
   ]
 }
 ```
+  </p>
+</details>
 
 ### Step 5: Deploy Your Stack
 Deploy your stack using SAM if you haven't already done so. You'll need the SAM CLI for this. Check out [the AWS SAM CLI documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) for more information.
