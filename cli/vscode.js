@@ -18,7 +18,9 @@ export function configure(outDir) {
     }));
   }
 
-  const launchConfig = JSON.parse(fs.readFileSync(".vscode/launch.json", 'utf-8'));
+  let launchConfigStr = fs.readFileSync(".vscode/launch.json", 'utf-8');
+  launchConfigStr = launchConfigStr.replace(/\/\/.*/g, '');
+  const launchConfig = JSON.parse(launchConfigStr);
   const launchConfigExists = launchConfig.configurations.find((config) => config.name === "Debug Lambda functions");
   if (!launchConfigExists) launchConfig.configurations.push(
     {
@@ -40,7 +42,9 @@ export function configure(outDir) {
 
   fs.writeFileSync(".vscode/launch.json", JSON.stringify(launchConfig, null, 2));
 
-  const tasksConfig = JSON.parse(fs.readFileSync(".vscode/tasks.json", 'utf-8'));
+  let tasksConfigStr = fs.readFileSync(".vscode/tasks.json", 'utf-8');
+  tasksConfigStr = launchConfigStr.replace(/\/\/.*/g, '');
+  const tasksConfig = JSON.parse(tasksConfigStr);
   const tasksConfigExists = tasksConfig.tasks.find((config) => config.label === "lambda-debug-cleanup");
 
   if (!tasksConfigExists) tasksConfig.tasks.push(
