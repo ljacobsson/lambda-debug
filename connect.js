@@ -175,6 +175,10 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
   }
   let baseDir = obj.uri;
   if (process.env.outDir) {
+    if (!fs.existsSync(process.env.outDir)) {
+      console.log(`outDir ${process.env.outDir} does not exist. Have you compiled?`);
+      process.exit(1);
+    }
     if (!process.env.outDir.endsWith("/")) {
       baseDir = process.env.outDir + "/";
     }
