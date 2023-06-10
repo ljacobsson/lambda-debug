@@ -20,7 +20,7 @@ const config = ini.parse(fs.readFileSync(`samconfig.toml`, 'utf-8'));
 const configEnv = process.env.configEnv || 'default';
 const samconfig = config[configEnv].deploy.parameters;
 console.log(`Using profile: ${samconfig.profile || 'default'}`);
-const stsClient = new STSClient({ region: samconfig.region, credentials: fromSSO({ profile: 'default' }) });
+const stsClient = new STSClient({ region: samconfig.region, credentials: fromSSO({ profile: samconfig.profile || 'default' }) });
 const accountId = (await stsClient.send(new GetCallerIdentityCommand({}))).Account;
 const iotClient = new IoTClient({ region: samconfig.region, credentials: fromSSO({ profile: samconfig.profile || 'default' }) });
 const timer = new Date().getTime();
@@ -105,7 +105,7 @@ if (!fs.existsSync(".lambda-debug")) {
   };
   await createPolicy();
   await attachPolicy()
-  
+
   // Load the endpoint from AWS IoT console
   endpoint = await getIotEndpoint();
   // Load your AWS IoT certificates
