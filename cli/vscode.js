@@ -43,7 +43,7 @@ export function configure(outDir) {
   fs.writeFileSync(".vscode/launch.json", JSON.stringify(launchConfig, null, 2));
 
   let tasksConfigStr = fs.readFileSync(".vscode/tasks.json", 'utf-8');
-  tasksConfigStr = launchConfigStr.replace(/\/\/.*/g, '');
+  tasksConfigStr = tasksConfigStr.replace(/\/\/.*/g, '');
   const tasksConfig = JSON.parse(tasksConfigStr);
   const tasksConfigExists = tasksConfig.tasks.find((config) => config.label === "lambda-debug-cleanup");
 
