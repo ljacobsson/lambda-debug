@@ -180,7 +180,7 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
       process.exit(1);
     }
     if (!process.env.outDir.endsWith("/")) {
-      baseDir = process.env.outDir + "/";
+      baseDir = process.env.outDir + "/" + obj.uri;
     }
   }
 
