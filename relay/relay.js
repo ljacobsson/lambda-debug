@@ -1,13 +1,6 @@
 import fs from 'fs';
 import mqtt from 'mqtt';
 
-//make sure to do a clean exit before the function times out
-setInterval(() => {
-  if (context.getRemainingTimeInMillis() < 1000) {
-    console.log('Function is about to time out, making clean exit');
-    process.exit(0);
-  }
-}, 500);
 
 const config = JSON.parse(fs.readFileSync('config.json'));
 
@@ -29,6 +22,13 @@ const connectOptions = {
 
 const client = mqtt.connect(connectOptions);
 export const handler = async (event, context) => {
+  //make sure to do a clean exit before the function times out
+  setInterval(() => {
+    if (context.getRemainingTimeInMillis() < 1000) {
+      console.log('Function is about to time out, making clean exit');
+      process.exit(0);
+    }
+  }, 500);
 
   const promise = new Promise((resolve, reject) => {
     client.on('error', function (err) {
