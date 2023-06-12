@@ -1,26 +1,34 @@
 import fs from 'fs';
 import mqtt from 'mqtt';
 
+//make sure to do a clean exit before the function times out
+setInterval(() => {
+  if (context.getRemainingTimeInMillis() < 1000) {
+    console.log('Function is about to time out, making clean exit');
+    process.exit(0);
+  }
+}, 500);
+
+const config = JSON.parse(fs.readFileSync('config.json'));
+
+const cert = fs.readFileSync("cert.pem");
+const key = fs.readFileSync("key.pem");
+const ca = fs.readFileSync("AmazonRootCA1.pem");
+
+const connectOptions = {
+  connectTimeout: 4000,
+  ca: ca,
+  key: key,
+  cert: cert,
+  keepalive: 60,
+  clientId: 'mqtt-client-' + Math.floor((Math.random() * 1000000) + 1),
+  protocol: 'mqtts',
+  port: 8883,
+  host: config.endpoint
+};
+
+const client = mqtt.connect(connectOptions);
 export const handler = async (event, context) => {
-  const config = JSON.parse(fs.readFileSync('config.json'));
-
-  const cert = fs.readFileSync("cert.pem");
-  const key = fs.readFileSync("key.pem");
-  const ca = fs.readFileSync("AmazonRootCA1.pem");
-
-  const connectOptions = {
-    connectTimeout: 4000,
-    ca: ca,
-    key: key,
-    cert: cert,
-    keepalive: 60,
-    clientId: 'mqtt-client-' + Math.floor((Math.random() * 1000000) + 1),
-    protocol: 'mqtts',
-    port: 8883,
-    host: config.endpoint,
-  };
-
-  const client = mqtt.connect(connectOptions);
 
   const promise = new Promise((resolve, reject) => {
     client.on('error', function (err) {

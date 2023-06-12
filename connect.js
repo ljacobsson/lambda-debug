@@ -213,7 +213,6 @@ const connectOptions = {
   debug: true,
   reconnectPeriod: 0,
 };
-const mqttTimer = new Date().getTime();
 const client = mqtt.connect(connectOptions);
 
 client.on('error', function (err) {
