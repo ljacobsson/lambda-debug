@@ -19,7 +19,8 @@ if (fs.existsSync(cachePath)) {
 
 const config = ini.parse(fs.readFileSync(process.cwd() + "/samconfig.toml", 'utf-8'));
 const samConfig = config[configEnv].deploy.parameters;
-const stackName = samConfig.stack_name;
+const stackName = samConfig.stack_name || config[configEnv].global.parameters.stack_name;
+
 const profile = samConfig.profile || "default";
 
 const cfnClient = new CloudFormationClient({ credentials: fromSSO({ profile }) });

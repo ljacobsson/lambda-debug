@@ -113,13 +113,14 @@ if (!fs.existsSync(".lambda-debug")) {
   const cfnClient = new CloudFormationClient({
     region: 'eu-west-1',
     credentials: fromSSO({
-      profile: config.default.deploy.parameters.profile || 'default'
+      profile: config[configEnv].deploy.parameters.profile || 'default'
     })
   });
 
   console.log(`Loading necessary resources...`);
 
-  const stackName = config.default.deploy.parameters.stack_name;
+  const samConfig = config[configEnv].deploy.parameters;
+  const stackName = samConfig.stack_name || config[configEnv].global.parameters.stack_name;
 
   template = yamlParse(fs.readFileSync(path.join('template.yaml')).toString());
 
@@ -138,7 +139,7 @@ if (!fs.existsSync(".lambda-debug")) {
   const lambdaClient = new LambdaClient({
     region: 'eu-west-1',
     credentials: fromSSO({
-      profile: config.default.deploy.parameters.profile || 'default',
+      profile: config[configEnv].deploy.parameters.profile || 'default',
     })
   });
   if (!fs.existsSync(path.join(__dirname, `relay-${accountId}.zip`))) {
@@ -168,7 +169,7 @@ if (!fs.existsSync(".lambda-debug")) {
   functions = config.functions;
   template = config.template;
 }
-const functionSources = functions.map(key => { return { uri: template.Resources[key].Properties.CodeUri || template.Globals.Function.CodeUri, handler: template.Resources[key].Properties.Handler, name: key } }).reduce((map, obj) => {
+const functionSources = functions.map(key => { return { uri: template.Resources[key].Properties.CodeUri || template.Globals?.Function?.CodeUri, handler: template.Resources[key].Properties.Handler, name: key } }).reduce((map, obj) => {
   obj.uri = obj.uri || "";
   if (!obj.uri.endsWith("/")) {
     obj.uri = obj.uri + "/";
@@ -193,8 +194,19 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
     }
   });
   obj.handler = handlerFolders.join('/');
-  const handler = (obj.handler + '/' + functionHandler.split('.')[0]).replace('//', '/');
-  map[obj.name] = `file://${process.cwd()}/${baseDir}${handler}.js`;
+  const handler = (obj.handler + '/' + functionHandler.split('.')[0]).replace(/\/\//g, '/');
+  const handlerMethod = functionHandler.split('.')[1];
+  let jsExt = ".js";
+  for (const ext of [".js", ".mjs", ".jsx"]) {
+    if (fs.existsSync(`${process.cwd()}/${baseDir}${handler}${ext}`)) {
+      jsExt = ext;
+      break;
+    }
+  }
+  map[obj.name] = {
+    module: `file://${process.cwd()}/${baseDir}${handler}${jsExt}`,
+    handler: handlerMethod
+  };
 
   return map;
 }, {});
