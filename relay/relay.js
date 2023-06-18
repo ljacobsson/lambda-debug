@@ -21,6 +21,7 @@ const connectOptions = {
 };
 
 const client = mqtt.connect(connectOptions);
+let connected = false;
 export const handler = async (event, context) => {
   //make sure to do a clean exit before the function times out
   setInterval(() => {
@@ -36,11 +37,14 @@ export const handler = async (event, context) => {
       reject(err);
     });
 
+    if (connected) {
+      publishEvent(event, context);
+    }
+    
     client.on('connect', function () {
+      connected = true;
       console.log('Connected to AWS IoT broker');
-      const sessionId = new Date().getTime() + '-' + Math.floor((Math.random() * 1000000) + 1); // Unique ID for this debug session
-      client.subscribe(`lambda-debug/callback/${config.mac}/${sessionId}`);
-      client.publish('lambda-debug/event/' + config.mac, JSON.stringify({ event, context, envVars: process.env, sessionId }));
+      publishEvent(event, context);
     });
 
     client.on('message', function (topic, message) {
@@ -61,3 +65,10 @@ export const handler = async (event, context) => {
   const message = await promise;
   return JSON.parse(message);
 };
+
+function publishEvent(event, context) {
+  const sessionId = new Date().getTime() + '-' + Math.floor((Math.random() * 1000000) + 1); // Unique ID for this debug session
+  client.subscribe(`lambda-debug/callback/${config.mac}/${sessionId}`);
+  client.publish('lambda-debug/event/' + config.mac, JSON.stringify({ event, context, envVars: process.env, sessionId }));
+}
+
