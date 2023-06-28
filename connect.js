@@ -111,7 +111,7 @@ if (!fs.existsSync(".lambda-debug")) {
   // Load your AWS IoT certificates
   certData.ca = fs.readFileSync(path.join(__dirname, 'AmazonRootCA1.pem')).toString(); // Download this from Amazon's website   
   const cfnClient = new CloudFormationClient({
-    region: 'eu-west-1',
+    region: samconfig.region,
     credentials: fromSSO({
       profile: config[configEnv].deploy.parameters.profile || 'default'
     })
@@ -137,7 +137,7 @@ if (!fs.existsSync(".lambda-debug")) {
 
   // replace function code with stub-local.js
   const lambdaClient = new LambdaClient({
-    region: 'eu-west-1',
+    region: samConfig.region,
     credentials: fromSSO({
       profile: config[configEnv].deploy.parameters.profile || 'default',
     })
@@ -253,13 +253,13 @@ client.on('close', function () {
   console.log('Disconnected from live debug session');
 });
 
-process.on('SIGINT', async function () {
-  console.log("Caught interrupt signal");
-  process.exit();
-});
-
+if (!config.childProcess) {
+  process.on('SIGINT', async function () {
+    console.log("Caught interrupt signal");
+    process.exit();
+  });
+}
 process.on("exit", async (x) => {
-  console.log("Caught exit signal");
   // delete certificates
   client.publish('lambda-debug/callback/' + mac, JSON.stringify({ event: 'lambda-debug-exit', context: {} }));
   client.end();
@@ -275,7 +275,6 @@ process.on("exit", async (x) => {
     certificateId: certData.certificateId
   }));
   fs.unlinkSync(".lambda-debug");
-  process.exit();
 }
 );
 
@@ -294,7 +293,7 @@ async function updateFunctions(func, lambdaClient) {
       const updateFunctionConfigurationCommand = new UpdateFunctionConfigurationCommand({
         FunctionName: functionName,
         Timeout: parseInt(process.env.timeout || 60),
-        MemorySize: 128,
+        MemorySize: 256,
         Handler: 'relay.handler',
       });
       await lambdaClient.send(updateFunctionConfigurationCommand);

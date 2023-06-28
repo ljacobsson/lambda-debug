@@ -3,7 +3,7 @@ import { GetTemplateCommand, CloudFormationClient, ListStackResourcesCommand } f
 import { LambdaClient, UpdateFunctionCodeCommand, UpdateFunctionConfigurationCommand } from "@aws-sdk/client-lambda"
 import ini from 'ini';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
-console.log("Cleaning up....");
+console.log("Cleaning up...");
 let configEnv = 'default';
 let functions = undefined;
 const cachePath = process.cwd() + "/.lambda-debug";
@@ -20,11 +20,11 @@ if (fs.existsSync(cachePath)) {
 const config = ini.parse(fs.readFileSync(process.cwd() + "/samconfig.toml", 'utf-8'));
 const samConfig = config[configEnv].deploy.parameters;
 const stackName = samConfig.stack_name || config[configEnv].global.parameters.stack_name;
-
+const region = samConfig.region || config[configEnv].global.parameters.region;
 const profile = samConfig.profile || "default";
 
-const cfnClient = new CloudFormationClient({ credentials: fromSSO({ profile }) });
-const lambdaClient = new LambdaClient({ credentials: fromSSO({ profile }) });
+const cfnClient = new CloudFormationClient({ region, credentials: fromSSO({ profile }) });
+const lambdaClient = new LambdaClient({ region, credentials: fromSSO({ profile }) });
 const templateResponse = await cfnClient.send(new GetTemplateCommand({ StackName: stackName, TemplateStage: "Processed" }));
 const stack = await cfnClient.send(new ListStackResourcesCommand({ StackName: stackName }));
 
