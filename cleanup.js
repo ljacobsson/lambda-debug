@@ -3,7 +3,7 @@ import { GetTemplateCommand, CloudFormationClient, ListStackResourcesCommand } f
 import { LambdaClient, UpdateFunctionCodeCommand, UpdateFunctionConfigurationCommand } from "@aws-sdk/client-lambda"
 import ini from 'ini';
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
-import rimraf from 'rimraf';
+
 console.log("Cleaning up...");
 let configEnv = 'default';
 let functions = undefined;
@@ -20,7 +20,7 @@ if (fs.existsSync(cachePath)) {
 
 if (fs.existsSync(process.cwd() + "/.samp-out")) {
   console.log("Removing .samp-out directory");
-  rimraf.rimrafSync(process.cwd() + "/.samp-out");
+  fs.rmSync(process.cwd() + "/.samp-out", { recursive: true, force: true });
 }
 
 const config = ini.parse(fs.readFileSync(process.cwd() + "/samconfig.toml", 'utf-8'));
