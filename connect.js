@@ -208,7 +208,7 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
     }
   }
   map[obj.name] = {
-    module: `file://${process.cwd()}/${baseDir}${handler}${jsExt}`,
+    module: `file://${`${process.cwd()}/${baseDir}${handler}${jsExt}`.replace(/\/\//g, '/')}`,
     handler: handlerMethod
   };
 
