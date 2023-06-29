@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import mqtt from 'mqtt';
 import { routeEvent } from "./event-router.js";
-import os from 'os';
+import os, { homedir } from 'os';
 import { yamlParse } from 'yaml-cfn'
 import { CloudFormationClient, ListStackResourcesCommand, GetTemplateCommand } from '@aws-sdk/client-cloudformation';
 import ini from 'ini';
@@ -26,6 +26,10 @@ const iotClient = new IoTClient({ region: samconfig.region, credentials: fromSSO
 const timer = new Date().getTime();
 let certData, endpoint, stack, functions, template;
 const policyName = "lambda-debug-policy";
+
+const packageVersion = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'))).version;
+
+const zipFilePath = path.join(os.homedir(), '.lambda-debug', `relay-${accountId}-${packageVersion}.zip`);
 
 if (!fs.existsSync(".lambda-debug")) {
   const createKeysAndCertificate = async () => {
@@ -142,11 +146,11 @@ if (!fs.existsSync(".lambda-debug")) {
       profile: config[configEnv].deploy.parameters.profile || 'default',
     })
   });
-  if (!fs.existsSync(path.join(__dirname, `relay-${accountId}.zip`))) {
+  if (!fs.existsSync(zipFilePath)) {
     console.log(`Creating Lambda artifact zip`);
     fs.writeFileSync(path.join(__dirname, 'relay', 'config.json'), JSON.stringify({ mac: mac, endpoint: endpoint }));
     //create zip file of relay folder
-    const output = fs.createWriteStream(path.join(__dirname, `relay-${accountId}.zip`));
+    const output = fs.createWriteStream(zipFilePath);
     const archive = archiver('zip', {
       zlib: { level: 9 } // Sets the compression level.
     });
@@ -244,7 +248,7 @@ client.on('connect', async function () {
 client.on('message', async function (topic, message) {
   const obj = JSON.parse(message.toString());
   process.env = obj.envVars;
-  const result = await routeEvent(obj.event, obj.context, stack, functionSources);
+  const result = await routeEvent(obj.event, obj.context, stack, functionSources);  
   client.publish(`lambda-debug/callback/${mac}/${obj.sessionId}`, JSON.stringify(result || {}));
 });
 
@@ -303,7 +307,7 @@ async function updateFunctions(func, lambdaClient) {
 
       const updateFunctionCodeCommand = new UpdateFunctionCodeCommand({
         FunctionName: functionName,
-        ZipFile: fs.readFileSync(path.join(__dirname, `relay-${accountId}.zip`))
+        ZipFile: fs.readFileSync(zipFilePath)
       });
 
       await lambdaClient.send(updateFunctionCodeCommand);

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import mqtt from 'mqtt';
-
+import { clearInterval } from 'timers';
 
 const config = JSON.parse(fs.readFileSync('config.json'));
 
@@ -13,25 +13,25 @@ const connectOptions = {
   ca: ca,
   key: key,
   cert: cert,
-  keepalive: 60,
+  keepalive: 0,
   clientId: 'mqtt-client-' + Math.floor((Math.random() * 1000000) + 1),
   protocol: 'mqtts',
   port: 8883,
   host: config.endpoint
 };
-
 const client = mqtt.connect(connectOptions);
 let connected = false;
-export const handler = async (event, context) => {
-  //make sure to do a clean exit before the function times out
-  setInterval(() => {
-    if (context.getRemainingTimeInMillis() < 1000) {
-      console.log('Function is about to time out, making clean exit');
-      process.exit(0);
-    }
-  }, 500);
 
+export const handler = async (event, context) => {
   const promise = new Promise((resolve, reject) => {
+    let interval;
+    interval = setInterval(() => {
+      if (context.getRemainingTimeInMillis() < 1000) {
+        console.log('Function is about to time out, making clean exit');
+        clearInterval(interval);
+        resolve('exit');
+      }
+    }, 500);
     client.on('error', function (err) {
       console.log('Connection Error: ' + err);
       reject(err);
@@ -40,7 +40,7 @@ export const handler = async (event, context) => {
     if (connected) {
       publishEvent(event, context);
     }
-    
+
     client.on('connect', function () {
       connected = true;
       console.log('Connected to AWS IoT broker');
