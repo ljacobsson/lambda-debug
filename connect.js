@@ -189,7 +189,7 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
     }
   }
   const globals = template.Globals?.Function || {};
-  const handlerFolders = (obj.handler || globals.handler).split('/');
+  const handlerFolders = (obj.handler || globals.Handler).split('/');
   const functionHandler = handlerFolders.pop();
   // remove folders if they don't exist on dsk
   handlerFolders.forEach((folder, index) => {

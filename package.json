@@ -1,6 +1,6 @@
 {
   "name": "lambda-debug",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Library to help debug JS/TS AWS Lambda functions locally",
   "main": "index.js",
   "type": "module",
