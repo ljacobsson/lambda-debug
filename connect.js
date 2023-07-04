@@ -1,5 +1,5 @@
 import { IoTClient, DetachPolicyCommand, UpdateCertificateCommand, DeleteCertificateCommand, CreateKeysAndCertificateCommand, DescribeEndpointCommand, CreatePolicyCommand, AttachPolicyCommand, GetPolicyCommand } from "@aws-sdk/client-iot";
-import { LambdaClient, UpdateFunctionCodeCommand, GetFunctionCommand, UpdateFunctionConfigurationCommand } from "@aws-sdk/client-lambda";
+import { LambdaClient, UpdateFunctionCodeCommand, GetFunctionCommand, UpdateFunctionConfigurationCommand, GetLayerVersionByArnCommand } from "@aws-sdk/client-lambda";
 import { fromSSO } from '@aws-sdk/credential-provider-sso';
 import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 import fs from 'fs';
@@ -13,6 +13,27 @@ import ini from 'ini';
 import getMac from 'getmac';
 import archiver from 'archiver';
 import { fileURLToPath } from 'url';
+import axios from "axios";
+import AdmZip from 'adm-zip';
+// import { createRequire, Module } from 'module';
+
+// const require = createRequire(import.meta.url);
+
+// const customRequire = Module.createRequireFromPath(path.resolve('./index.js'));
+
+// // Intercept and modify file resolution
+// customRequire.resolve = function (request, options) {
+//   // Custom logic to modify the file resolution
+//   if (request === '/opt/nodejs/index.js') {
+//     const modifiedPath = '/path/to/custom/index.js';
+//     return this.resolve(modifiedPath, options);
+//   }
+
+//   // Delegate to the original resolution method
+//   return this.constructor.resolve(request, options);
+// };
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const mac = getMac();
@@ -131,6 +152,7 @@ if (!fs.existsSync(".lambda-debug")) {
   stack = await cfnClient.send(new ListStackResourcesCommand({ StackName: stackName }));
 
   functions = Object.keys(template.Resources).filter(key => template.Resources[key].Type === 'AWS::Serverless::Function');
+
   if (process.env.includeFunctions) {
     const includeFunctions = process.env.includeFunctions.split(',').map(f => f.trim());
     functions = functions.filter(f => includeFunctions.includes(f));
@@ -146,6 +168,10 @@ if (!fs.existsSync(".lambda-debug")) {
       profile: config[configEnv].deploy.parameters.profile || 'default',
     })
   });
+
+  //await downloadLayers(lambdaClient, stack);
+
+
   if (!fs.existsSync(zipFilePath)) {
     console.log(`Creating Lambda artifact zip`);
     fs.writeFileSync(path.join(__dirname, 'relay', 'config.json'), JSON.stringify({ mac: mac, endpoint: endpoint }));
@@ -189,6 +215,7 @@ const functionSources = functions.map(key => { return { uri: template.Resources[
     }
   }
   const globals = template.Globals?.Function || {};
+  console.log(template.Globals?.Function);
   const handlerFolders = (obj.handler || globals.Handler).split('/');
   const functionHandler = handlerFolders.pop();
   // remove folders if they don't exist on dsk
@@ -248,7 +275,7 @@ client.on('connect', async function () {
 client.on('message', async function (topic, message) {
   const obj = JSON.parse(message.toString());
   process.env = obj.envVars;
-  const result = await routeEvent(obj.event, obj.context, stack, functionSources);  
+  const result = await routeEvent(obj.event, obj.context, stack, functionSources);
   client.publish(`lambda-debug/callback/${mac}/${obj.sessionId}`, JSON.stringify(result || {}));
 });
 
@@ -326,8 +353,48 @@ async function updateFunctions(func, lambdaClient) {
     }
     updated = true;
   } while (!updated);
+  //  fs.symlinkSync(path.resolve('.samp-layer/nodejs'), path.resolve('/opt/nodejs'), 'dir');
+  // console.log(`To use Lambda layers, you need to create a symlink to the layer folder. (/opt/nodejs -> ${process.cwd()}/.samp-layers/nodejs)`);
+  // try {
+  //   execSync(`sudo rm -f /opt/nodejs`);
+  // }
+  // catch (e) { 
+  //   console.log("Failed to remove symlink");
+  // }
+
+  // execSync(`sudo ln -s ${process.cwd()}/.samp-layers/nodejs /opt/nodejs`);
+  // const test = await import("/opt/nodejs/index.js")
+  // console.log("Test", test.toString("utf-8"));
 }
 
 function debugInProgress() {
   return fs.existsSync(".lambda-debug");
+}
+
+async function downloadLayers(lambdaClient, stack) {
+  for (const resource of stack.StackResourceSummaries.filter(p => p.ResourceType === "AWS::Lambda::Function")) {
+    const lambda = await lambdaClient.send(new GetFunctionCommand({
+      FunctionName: resource.PhysicalResourceId
+    }));
+    if (lambda.Configuration.Layers.length > 0) {
+      console.log(`Downloading layers for ${resource.LogicalResourceId}...`, lambda.Configuration.Layers);
+      //    Arn: 'arn:aws:lambda:eu-west-1:232740153640:layer:SharedLayer:1'
+      for (const layer of lambda.Configuration.Layers) {
+        const layerResponse = await lambdaClient.send(new GetLayerVersionByArnCommand({
+          Arn: layer.Arn
+        }));
+        const url = layerResponse.Content.Location;
+
+        try {
+          const response = await axios.get(url, { responseType: 'arraybuffer' });
+
+          const zip = new AdmZip(response.data);
+          zip.extractAllTo('./.samp-layers/', true);
+          console.log('ZIP file extracted successfully');
+        } catch (error) {
+          console.error('Error downloading or extracting ZIP file:', error);
+        }
+      }
+    }
+  }
 }
