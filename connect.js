@@ -126,7 +126,7 @@ if (!fs.existsSync(".lambda-debug")) {
   const samConfig = config[configEnv].deploy.parameters;
   const stackName = samConfig.stack_name || config[configEnv].global.parameters.stack_name;
 
-  template = yamlParse(fs.readFileSync(path.join('template.yaml')).toString());
+  template = yamlParse(fs.readFileSync(findSAMTemplateFile('.')).toString());
 
   stack = await cfnClient.send(new ListStackResourcesCommand({ StackName: stackName }));
 
@@ -248,7 +248,7 @@ client.on('connect', async function () {
 client.on('message', async function (topic, message) {
   const obj = JSON.parse(message.toString());
   process.env = obj.envVars;
-  const result = await routeEvent(obj.event, obj.context, stack, functionSources);  
+  const result = await routeEvent(obj.event, obj.context, stack, functionSources);
   client.publish(`lambda-debug/callback/${mac}/${obj.sessionId}`, JSON.stringify(result || {}));
 });
 
@@ -330,4 +330,26 @@ async function updateFunctions(func, lambdaClient) {
 
 function debugInProgress() {
   return fs.existsSync(".lambda-debug");
+}
+
+function findSAMTemplateFile(directory) {
+  const files = fs.readdirSync(directory);
+
+  for (const file of files) {
+    const filePath = path.join(directory, file);
+
+    // Check if the file extension is .json, .yml, or .yaml
+    if (file.match(/\.(json|ya?ml)$/i)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+
+      // Check if the content of the file contains the specified string
+      if (content.includes('AWS::Serverless-2016-10-31')) {
+        console.log('SAM template file found:', file);
+        return filePath;
+      }
+    }
+  }
+
+  console.log('Template file not found. Will not be able to route events locally.');
+  return null;
 }
