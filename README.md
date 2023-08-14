@@ -1,3 +1,12 @@
+# DEPRECATED
+
+Please use [samp-cli](https://github.com/ljacobsson/samp-cli) for a much smoother local debugging experience
+
+
+
+
+
+
 # lambda-debug
 
 Lambda-Debug is a tool that enables you to invoke AWS Lambda functions in the cloud from any event source and intercept the requests with breakpoints locally. There's similar functionality in [SST](https://sst.dev/) which this is inspired by, but is designed to work with AWS SAM and CloudFormation and, in a later version, CDK.
